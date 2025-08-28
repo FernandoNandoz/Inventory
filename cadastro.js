@@ -47,7 +47,7 @@ const setorEl = document.getElementById('setor');
 // Redireciona para seleção de setor se não houver setor selecionado
 const setorSelecionado = localStorage.getItem('setorSelecionado');
 if (!setorSelecionado) {
-    window.location.href = 'setor.html';
+    window.location.href = 'index.html';
 }
 
 // Botão para atualizar setores do Sheets

@@ -82,7 +82,7 @@ btnEntrarCadastrar.addEventListener('click', () => {
     return;
   }
   localStorage.setItem('setorSelecionado', setor);
-  window.location.href = 'index.html';
+  window.location.href = 'cadastro.html';
 });
 
 // Inicialização
