@@ -34,6 +34,7 @@
     .btn-add-unidade-item {
       margin: 0;
       width: 100%;
+      max-width: 200px;
       padding: 10px 16px;
       font-size: 0.85rem;
     }
@@ -124,10 +125,11 @@
     <section class="itens-container">
       <div class="itens-header">
         <h2 style="margin:0;">Itens Cadastrados</h2>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <select id="filtroSetor" class="filtro-setor"></select>
-          <button id="btnCarregarItens" type="button" class="btn-add-unidade-item">Carregar Itens</button>
-        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input id="filtroRP" type="text" class="filtro-setor" placeholder="Pesquisar por RP..." style="width:100%;" />
+        <select id="filtroSetor" class="filtro-setor"></select>
+        <button id="btnCarregarItens" type="button" class="btn-add-unidade-item">Carregar Itens</button>
       </div>
       <div id="statusMsg" class="status"></div>
       <div style="overflow-x:auto;">

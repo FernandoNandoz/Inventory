@@ -101,11 +101,20 @@ function carregarItensLocal() {
   renderTabela();
 }
 
-// Renderiza a tabela de itens
+// Renderiza a tabela de itens com filtro de setor e RP
 function renderTabela() {
   const setorFiltro = filtroSetor.value;
+  const rpFiltro = (document.getElementById('filtroRP')?.value || '').trim().toLowerCase();
   tabelaItens.innerHTML = '';
-  todosItens.filter(item => !setorFiltro || item.setor === setorFiltro).forEach(item => {
+  todosItens.filter(item => {
+    const setorOk = !setorFiltro || setorFiltro === '' || item.setor === setorFiltro;
+    // Garante busca por RP mesmo se for número
+    let rpItem = item.rp;
+    if (typeof rpItem === 'number') rpItem = String(rpItem);
+    rpItem = (rpItem || '').toLowerCase();
+    const rpOk = !rpFiltro || rpItem.includes(rpFiltro);
+    return setorOk && rpOk;
+  }).forEach(item => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td data-label="Setor">${item.setor || ''}</td>
@@ -120,6 +129,10 @@ function renderTabela() {
 
 // Evento de filtro
 filtroSetor.addEventListener('change', renderTabela);
+const filtroRP = document.getElementById('filtroRP');
+if (filtroRP) {
+  filtroRP.addEventListener('input', renderTabela);
+}
 
 // Habilita botão só se setor selecionado
 selectSetor.addEventListener('change', () => {
