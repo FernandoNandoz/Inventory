@@ -44,46 +44,12 @@ const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEVlymN
 // --- INICIALIZAÇÃO DE CAMPOS E SETOR FIXO ---
 const numItemEl = document.getElementById('numItem');
 const setorEl = document.getElementById('setor');
-// Redireciona para seleção de setor se não houver setor selecionado
 const setorSelecionado = localStorage.getItem('setorSelecionado');
 if (!setorSelecionado) {
     window.location.href = 'index.html';
+} else if (setorEl) {
+    setorEl.textContent = setorSelecionado;
 }
-
-// Botão para atualizar setores do Sheets
-const btnAtualizarSetores = document.createElement('button');
-btnAtualizarSetores.type = 'button';
-btnAtualizarSetores.textContent = 'Atualizar setores do Sheets';
-btnAtualizarSetores.className = 'btn-add-unidade';
-btnAtualizarSetores.style.marginBottom = '12px';
-setorEl && setorEl.parentNode.insertBefore(btnAtualizarSetores, setorEl.nextSibling);
-
-async function atualizarSetoresDoSheets() {
-    btnAtualizarSetores.disabled = true;
-    btnAtualizarSetores.textContent = 'Atualizando...';
-    try {
-        const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=setores');
-        if (resp.ok) {
-            const data = await resp.json();
-            if (Array.isArray(data.setores) && data.setores.length) {
-                localStorage.setItem('setoresDisponiveis', JSON.stringify(data.setores));
-                popularSetoresLocal();
-                statusMsg.textContent = 'Setores atualizados com sucesso!';
-            } else {
-                statusMsg.textContent = 'Nenhum setor encontrado no Sheets.';
-            }
-        } else {
-            statusMsg.textContent = 'Erro ao buscar setores do Sheets.';
-        }
-    } catch {
-        statusMsg.textContent = 'Erro de conexão ao atualizar setores.';
-    } finally {
-        btnAtualizarSetores.disabled = false;
-        btnAtualizarSetores.textContent = 'Atualizar setores do Sheets';
-    }
-}
-
-btnAtualizarSetores.addEventListener('click', atualizarSetoresDoSheets);
 const rpContainer = document.getElementById('rpContainer');
 const form = document.getElementById('inventarioForm');
 const btnSalvar = document.getElementById('btnSalvar');
@@ -144,51 +110,15 @@ function renderTabelaPendentes() {
     pendentes.forEach(item => adicionarNaTabela(item));
 }
 
-// Sempre que mudar o setor, atualiza a tabela e o botão
-setorEl && setorEl.addEventListener('change', () => {
-    atualizarVisibilidadeBtnEnviar();
-    renderTabelaPendentes();
-});
-
 // Ao carregar, mostra os pendentes do setor atual
 if (setorEl) {
     atualizarVisibilidadeBtnEnviar();
     renderTabelaPendentes();
 }
 
-function popularSetoresLocal() {
-    let setores = [];
-    try {
-        setores = JSON.parse(localStorage.getItem('setoresDisponiveis') || '[]');
-    } catch {}
-    if (!setores.length) {
-        setores = [
-            'Laboratório CVT',
-            'Sala de Reunião',
-            'Almoxarifado',
-            'Recepção',
-            'Sala de TI',
-            'Auditório',
-            'Outro'
-        ];
-    }
-    setorEl.innerHTML = setores.map(s => `<option value="${s}">${s}</option>`).join('');
-    const setorSalvo = localStorage.getItem('setorSelecionado');
-    if (setorSalvo && setores.includes(setorSalvo)) {
-        setorEl.value = setorSalvo;
-    }
-    // Torna o campo setor readonly/disabled
-    setorEl.disabled = true;
-}
 
-// Remove troca de setor na tela de cadastro
-//setorEl && setorEl.addEventListener('change', () => {
-//    atualizarVisibilidadeBtnEnviar();
-//    renderTabelaPendentes();
-//});
 
-// Popular setores do localStorage ao carregar
-if (setorEl) popularSetoresLocal();
+
 
 function makeRPBlock(i) {
     const block = document.createElement('div');
@@ -318,7 +248,7 @@ function makeRPBlock(i) {
 const btnAddUnidade = document.createElement('button');
 btnAddUnidade.type = 'button';
 btnAddUnidade.textContent = 'Adicionar Unidade';
-btnAddUnidade.className = 'btn-add-unidade';
+btnAddUnidade.className = 'btn-add-unidade-addUnidade';
 rpContainer.after(btnAddUnidade);
 
 function addRPBlock() {

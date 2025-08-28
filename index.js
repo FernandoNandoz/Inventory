@@ -1,3 +1,38 @@
+// Atualizar setores do Sheets
+const btnAtualizarSetores = document.getElementById('btnAtualizarSetores');
+if (btnAtualizarSetores) {
+  btnAtualizarSetores.addEventListener('click', async () => {
+    btnAtualizarSetores.disabled = true;
+    btnAtualizarSetores.textContent = 'Atualizando...';
+    selectSetor.disabled = true;
+    filtroSetor.disabled = true;
+    btnEntrarCadastrar.disabled = true;
+    try {
+      const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=setores');
+      if (resp.ok) {
+        const data = await resp.json();
+        if (Array.isArray(data.setores) && data.setores.length) {
+          selectSetor.innerHTML = '<option value="">Selecione o setor</option>' + data.setores.map(s => `<option value="${s}">${s}</option>`).join('');
+          filtroSetor.innerHTML = '<option value="">Todos os setores</option>' + data.setores.map(s => `<option value="${s}">${s}</option>`).join('');
+          localStorage.setItem('setoresDisponiveis', JSON.stringify(data.setores));
+          statusMsg.textContent = 'Setores atualizados com sucesso!';
+        } else {
+          statusMsg.textContent = 'Nenhum setor encontrado no Sheets.';
+        }
+      } else {
+        statusMsg.textContent = 'Erro ao buscar setores do Sheets.';
+      }
+    } catch {
+      statusMsg.textContent = 'Erro de conexão ao atualizar setores.';
+    } finally {
+      btnAtualizarSetores.disabled = false;
+      btnAtualizarSetores.textContent = 'Atualizar setores do Sheets';
+      selectSetor.disabled = false;
+      filtroSetor.disabled = false;
+      btnEntrarCadastrar.disabled = !selectSetor.value;
+    }
+  });
+}
 // Configuração da URL do Apps Script
 const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwEVlymNRwoj1mAqQjvT4JJu55bf3BvB2ZwEx4HmfuGP0r2vxLASSKjoulE2jIdDydt/exec";
 
@@ -9,32 +44,38 @@ const statusMsg = document.getElementById('statusMsg');
 
 let todosItens = [];
 
-// Carrega setores do Sheets
-async function carregarSetores() {
+// Carrega setores do localStorage, só busca do Sheets ao clicar no botão
+function carregarSetoresLocal() {
+  let setores = [];
   try {
-    const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=setores');
-    if (resp.ok) {
-      const data = await resp.json();
-      if (Array.isArray(data.setores)) {
-        selectSetor.innerHTML = '<option value="">Selecione o setor</option>' + data.setores.map(s => `<option value="${s}">${s}</option>`).join('');
-        filtroSetor.innerHTML = '<option value="">Todos os setores</option>' + data.setores.map(s => `<option value="${s}">${s}</option>`).join('');
-      }
-    }
+    setores = JSON.parse(localStorage.getItem('setoresDisponiveis') || '[]');
   } catch {}
+  if (setores.length) {
+    selectSetor.innerHTML = '<option value="">Selecione o setor</option>' + setores.map(s => `<option value="${s}">${s}</option>`).join('');
+    filtroSetor.innerHTML = '<option value="">Todos os setores</option>' + setores.map(s => `<option value="${s}">${s}</option>`).join('');
+  } else {
+    // Se não houver cache, mostra opção vazia
+    selectSetor.innerHTML = '<option value="">Nenhum setor disponível</option>';
+    filtroSetor.innerHTML = '<option value="">Nenhum setor disponível</option>';
+  }
 }
 
-// Carrega todos os itens cadastrados do Sheets
+// Carrega todos os itens cadastrados do Sheets (apenas quando solicitado pelo botão)
 async function carregarItens() {
   statusMsg.textContent = 'Carregando itens...';
   tabelaItens.innerHTML = '';
+  btnCarregarItens.disabled = true;
+  filtroSetor.disabled = true;
+  if (typeof btnAtualizarSetores !== 'undefined' && btnAtualizarSetores) btnAtualizarSetores.disabled = true;
   try {
     const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=inventario');
     if (resp.ok) {
       const data = await resp.json();
       if (Array.isArray(data.itens)) {
+        localStorage.setItem('itensCadastrados', JSON.stringify(data.itens));
         todosItens = data.itens;
         renderTabela();
-        statusMsg.textContent = '';
+        statusMsg.textContent = 'Itens atualizados com sucesso!';
       } else {
         statusMsg.textContent = 'Nenhum item encontrado.';
       }
@@ -43,7 +84,21 @@ async function carregarItens() {
     }
   } catch {
     statusMsg.textContent = 'Erro de conexão.';
+  } finally {
+    btnCarregarItens.disabled = false;
+    filtroSetor.disabled = false;
+    if (typeof btnAtualizarSetores !== 'undefined' && btnAtualizarSetores) btnAtualizarSetores.disabled = false;
   }
+}
+
+// Carrega itens do localStorage
+function carregarItensLocal() {
+  let itens = [];
+  try {
+    itens = JSON.parse(localStorage.getItem('itensCadastrados') || '[]');
+  } catch {}
+  todosItens = itens;
+  renderTabela();
 }
 
 // Renderiza a tabela de itens
@@ -53,13 +108,10 @@ function renderTabela() {
   todosItens.filter(item => !setorFiltro || item.setor === setorFiltro).forEach(item => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td>${item.numItem || ''}</td>
-      <td>${item.setor || ''}</td>
-      <td>${item.especificacao || ''}</td>
-      <td>${item.quantidade || ''}</td>
-      <td>${item.rp || ''}</td>
-      <td>${item.estado || ''}</td>
-      <td>${(item.fotos || '').split(',').map(url => url && url.trim() ? `<img src="${url.trim()}" class="img-thumb" loading="lazy">` : '').join('')}</td>
+      <td data-label="Setor">${item.setor || ''}</td>
+      <td data-label="RP">${item.rp || ''}</td>
+      <td data-label="Especificação">${item.especificacao || ''}</td>
+      <td data-label="Quantidade">${item.quantidade || ''}</td>
     `;
     tabelaItens.appendChild(tr);
   });
@@ -86,5 +138,11 @@ btnEntrarCadastrar.addEventListener('click', () => {
 });
 
 // Inicialização
-carregarSetores();
-carregarItens();
+carregarSetoresLocal();
+carregarItensLocal();
+
+// Evento do botão para carregar itens do Sheets
+const btnCarregarItens = document.getElementById('btnCarregarItens');
+if (btnCarregarItens) {
+  btnCarregarItens.addEventListener('click', carregarItens);
+}
