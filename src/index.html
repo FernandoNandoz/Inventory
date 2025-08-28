@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Inventário CGTI – Cadastro por Setor</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+</head>
+<body>
+  <header><h1>Inventário CGTI – Cadastro</h1></header>
+  <main>
+    <div style="max-width:980px;margin:0 auto 18px auto;text-align:left;">
+      <button id="btnVoltarSetor" class="btn-secondary" style="margin:18px 0 0 0;">&larr; Voltar para seleção de setor</button>
+    </div>
+    <section class="card">
+
+      <h2>Formulário (Mobile First)</h2>
+
+      <form id="inventarioForm">
+        <div class="grid grid-2">
+          <div>
+            <label>Nº Item</label>
+            <input type="text" id="numItem" readonly />
+          </div>
+          <div>
+            <label>Setor</label>
+            <select id="setor" required>
+              <option value="">Selecione o setor</option>
+              <!-- opções serão populadas via JS -->
+            </select>
+          </div>
+        </div>
+        
+        <label>Especificação do Material/Equipamento</label>
+        <textarea id="especificacao" placeholder="Ex.: Desktop Dell Optiplex 7050, i5, 8GB, SSD..." required></textarea>
+        
+        <div class="grid grid-2">
+          <div></div>
+          <!-- Estado padrão removido -->
+        </div>
+
+        <div id="rpContainer"></div>
+
+        <div class="actions">
+          <button type="submit" class="btn-primary" id="btnSalvar">Salvar</button>
+          <button type="button" class="btn-secondary" id="btnLimpar">Limpar</button>
+        </div>
+        <div id="painelOffline" class="painel-offline" style="display:none;margin-top:18px;"></div>
+        <div class="status" id="statusMsg"></div>
+      </form>
+    </section>
+
+    <section class="card" style="margin-top:14px">
+      <h2>Itens Cadastrados</h2>
+      <table id="tabelaItens">
+        <thead>
+          <tr>
+            <th>Nº Item</th>
+            <th>Setor</th>
+            <th>Especificação</th>
+            <th>Quantidade</th>
+            <th>Detalhes por Unidade (RP, Estado, Foto)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer>
+    <p>Desenvolvido por CGTI - Centro de Gestão da Tecnologia da Informação</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    document.getElementById('btnVoltarSetor').onclick = function() {
+      window.location.href = 'setor.html';
+    };
+  </script>
+</body>
+</html>
