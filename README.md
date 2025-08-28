@@ -40,9 +40,9 @@ function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
 
-    const rootFolder = DriveApp.getFolderById("COLE_AQUI_ID_DA_PASTA"); // pasta raiz do inventário
+    const rootFolder = DriveApp.getFolderById("1ZiT6qNk0zwy3W_3vWUsUljdZlpITv68V"); // pasta raiz do inventário
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName("Página1");
+    const sheet = ss.getSheetByName("inventario"); // Corrigido nome da aba
 
     // procura ou cria subpasta do setor
     let setorFolder;
@@ -54,10 +54,11 @@ function doPost(e) {
     }
 
     // processa unidades
-    data.unidades.forEach(unidade => {
+    (data.unidades || []).forEach(unidade => {
       let fotoLinks = [];
 
-      unidade.fotos.forEach(fotoBase64 => {
+      (unidade.fotos || []).forEach(fotoBase64 => {
+        if (!fotoBase64) return;
         const contentType = fotoBase64.match(/^data:(.*);base64,/)[1];
         const bytes = Utilities.base64Decode(fotoBase64.split(",")[1]);
         const blob = Utilities.newBlob(bytes, contentType, `etiqueta_${unidade.rp}.jpg`);
@@ -73,7 +74,7 @@ function doPost(e) {
         data.numItem,
         data.setor,
         data.especificacao,
-        data.quantidade,
+        (data.unidades || []).length, // quantidade calculada
         unidade.rp,
         unidade.estado,
         fotoLinks.join(", ")
@@ -87,6 +88,44 @@ function doPost(e) {
     return ContentService.createTextOutput(JSON.stringify({status: "erro", msg: err}))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function doGet(e) {
+  if (e && e.parameter && e.parameter.pagina === "setores") {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName("setores");
+    const setores = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().flat().filter(String);
+    return ContentService.createTextOutput(JSON.stringify({ setores })).setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.pagina === "inventario") {
+    // NOVO ENDPOINT: retorna todos os itens cadastrados
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName("inventario");
+    const data = sheet.getDataRange().getValues();
+    const headers = data[0];
+    const itens = [];
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      itens.push({
+        numItem: row[0],
+        setor: row[1],
+        especificacao: row[2],
+        quantidade: row[3],
+        rp: row[4],
+        estado: row[5],
+        fotos: row[6] // links separados por vírgula
+      });
+    }
+    return ContentService.createTextOutput(JSON.stringify({ itens })).setMimeType(ContentService.MimeType.JSON);
+  }
+  if (e && e.parameter && e.parameter.proximoItem === "1") {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName("inventario"); // Corrigido nome da aba
+    const col = sheet.getRange(2, 1, sheet.getLastRow() - 1, 1).getValues().flat().filter(Number);
+    const max = col.length ? Math.max(...col.map(Number)) : 0;
+    return ContentService.createTextOutput(JSON.stringify({ proximoItem: max + 1 })).setMimeType(ContentService.MimeType.JSON);
+  }
+  return ContentService.createTextOutput(JSON.stringify({ status: "erro", msg: "Parâmetro inválido" })).setMimeType(ContentService.MimeType.JSON);
 }
 ```
 
