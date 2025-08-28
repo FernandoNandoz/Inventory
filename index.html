@@ -25,10 +25,11 @@
       padding: 0;
       padding: 10px 0;
     }
-    .btn-add-unidade {
+    .btn-add-unidade-atualizar {
       margin: 0;
       width: 35%;
       padding: 17px 0;
+      font-size: 0.85rem;
     }
     .btn-add-unidade-item {
       margin: 0;
@@ -110,12 +111,13 @@
   </style>
 </head>
 <body>
+  <header><h1>Inventário CGTI – Cadastro</h1></header>
   <main>
     <section class="setor-container">
       <h2>Selecione o Setor de Trabalho</h2>
       <div class="seletor-group">
         <select id="selectSetor"></select>
-        <button id="btnAtualizarSetores" type="button" class="btn-add-unidade">Atualizar setores do Sheets</button>
+        <button id="btnAtualizarSetores" type="button" class="btn-add-unidade-atualizar">Atualizar setores do Sheets</button>
       </div>
       <button id="btnEntrarCadastrar" class="btn-primary" disabled>Entrar e Cadastrar Item</button>
     </section>

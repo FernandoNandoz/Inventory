@@ -64,7 +64,7 @@ numItemEl.value = contadorItem;
 
 // Utiliza cache por setor
 function getCacheSetorAtual() {
-    const setor = setorEl.value || '';
+    const setor = setorSelecionado || setorEl.textContent.trim() || '';
     if (!setor) return [];
     let cache = {};
     try { cache = JSON.parse(localStorage.getItem('filaCadastroSetor') || '{}'); } catch {}
@@ -72,7 +72,7 @@ function getCacheSetorAtual() {
 }
 
 function setCacheSetorAtual(lista) {
-    const setor = setorEl.value || '';
+    const setor = setorSelecionado || setorEl.textContent.trim() || '';
     if (!setor) return;
     let cache = {};
     try { cache = JSON.parse(localStorage.getItem('filaCadastroSetor') || '{}'); } catch {}
@@ -81,7 +81,7 @@ function setCacheSetorAtual(lista) {
 }
 
 function limparCacheSetorAtual() {
-    const setor = setorEl.value || '';
+    const setor = setorSelecionado || setorEl.textContent.trim() || '';
     if (!setor) return;
     let cache = {};
     try { cache = JSON.parse(localStorage.getItem('filaCadastroSetor') || '{}'); } catch {}
@@ -311,7 +311,7 @@ form.addEventListener('submit', async (e)=>{
     statusMsg.textContent = '';
 
     const numItem = numItemEl.value;
-    const setor = setorEl.value.trim();
+        const setor = setorSelecionado || setorEl.textContent.trim();
     const especificacao = document.getElementById('especificacao').value.trim();
     const quantidade = rpContainer.querySelectorAll('.rp-block').length;
 
@@ -357,7 +357,7 @@ form.addEventListener('submit', async (e)=>{
 
     // Função para enviar todos os cadastros do setor atual para o Sheets
     async function enviarTodosParaPlanilha() {
-        const setor = setorEl.value || '';
+    const setor = setorSelecionado || setorEl.textContent.trim() || '';
         if (!setor) {
             statusMsg.textContent = 'Selecione um setor para enviar.';
             return;

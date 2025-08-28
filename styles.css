@@ -1,3 +1,65 @@
+/* Responsividade geral para todas as páginas (mobile/tablet) */
+@media (max-width: 700px) {
+    body, main {
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100vw !important;
+        background: var(--cinza-bg);
+    }
+    .setor-container, .itens-container, .card {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 10px 2vw !important;
+        margin: 0 0 18px 0 !important;
+        width: 100vw !important;
+        min-width: 0 !important;
+        max-width: 100vw !important;
+    }
+    .seletor-group, .itens-header {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+    .btn-add-unidade-atualizar, .btn-add-unidade-item, #btnEntrarCadastrar, .btn-primary, .btn-secondary, button {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 1.08rem !important;
+        padding: 14px 0 !important;
+        margin: 0 0 8px 0 !important;
+    }
+    select, input, textarea {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 1.08rem !important;
+        padding: 12px 10px !important;
+        margin-bottom: 8px !important;
+    }
+    .filtro-setor {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-bottom: 8px !important;
+    }
+    table, .responsive-table {
+        font-size: 0.98rem !important;
+        min-width: 0 !important;
+        width: 100vw !important;
+        overflow-x: auto !important;
+        display: block !important;
+    }
+    th, td {
+        padding: 10px 6px !important;
+        font-size: 0.98rem !important;
+    }
+    h1, h2 {
+        font-size: 1.15rem !important;
+        text-align: center !important;
+    }
+    .img-thumb, .thumbs img {
+        width: 48px !important;
+        height: 48px !important;
+    }
+}
 /* Responsividade aprimorada para cadastro */
 @media (max-width: 767px) {
     .card {
