@@ -59,7 +59,19 @@ const tbody = document.querySelector('#tabelaItens tbody');
 
 
 // --- USO LOCAL E CACHE POR SETOR ---
-let contadorItem = parseInt(localStorage.getItem('contadorItem') || '1', 10);
+
+// Busca o próximo número de item do setor, se disponível no cache sincronizado
+let contadorItem = 1;
+try {
+    const proximoNumItemPorSetor = JSON.parse(localStorage.getItem('proximoNumItemPorSetor') || '{}');
+    if (setorSelecionado && proximoNumItemPorSetor[setorSelecionado]) {
+        contadorItem = parseInt(proximoNumItemPorSetor[setorSelecionado], 10) || 1;
+    } else {
+        contadorItem = parseInt(localStorage.getItem('contadorItem') || '1', 10);
+    }
+} catch {
+    contadorItem = parseInt(localStorage.getItem('contadorItem') || '1', 10);
+}
 numItemEl.value = contadorItem;
 
 // Utiliza cache por setor
@@ -93,7 +105,7 @@ function limparCacheSetorAtual() {
 const btnEnviarPlanilha = document.createElement('button');
 btnEnviarPlanilha.type = 'button';
 btnEnviarPlanilha.textContent = 'Enviar para planilha';
-btnEnviarPlanilha.className = 'btn-add-unidade';
+btnEnviarPlanilha.className = 'btn-add-unidade-enviarPlanilha';
 btnEnviarPlanilha.style.display = 'none';
 btnEnviarPlanilha.style.marginBottom = '12px';
 form.parentNode.insertBefore(btnEnviarPlanilha, form.nextSibling);
@@ -114,6 +126,10 @@ function renderTabelaPendentes() {
 if (setorEl) {
     atualizarVisibilidadeBtnEnviar();
     renderTabelaPendentes();
+    // Garante que o botão está oculto se não houver itens pendentes
+    if (getCacheSetorAtual().length === 0) {
+        btnEnviarPlanilha.style.display = 'none';
+    }
 }
 
 
@@ -311,7 +327,7 @@ form.addEventListener('submit', async (e)=>{
     statusMsg.textContent = '';
 
     const numItem = numItemEl.value;
-        const setor = setorSelecionado || setorEl.textContent.trim();
+    const setor = setorSelecionado || setorEl.textContent.trim();
     const especificacao = document.getElementById('especificacao').value.trim();
     const quantidade = rpContainer.querySelectorAll('.rp-block').length;
 
@@ -326,7 +342,8 @@ form.addEventListener('submit', async (e)=>{
             unidades[i-1]._thumbsHTML = url ? `<img src="${url}" alt="Etiqueta">` : '';
         }
 
-        const payload = { numItem, setor, especificacao, unidades };
+        // Adiciona quantidade apenas no objeto principal
+        const payload = { numItem, setor, especificacao, quantidade, unidades };
 
         // Salva no cache do setor
         let lista = getCacheSetorAtual();
@@ -336,6 +353,12 @@ form.addEventListener('submit', async (e)=>{
         if (setor) {
             localStorage.setItem('setorSelecionado', setor);
         }
+        // Atualiza o cache do próximo número de item por setor
+        try {
+            const proximoNumItemPorSetor = JSON.parse(localStorage.getItem('proximoNumItemPorSetor') || '{}');
+            proximoNumItemPorSetor[setor] = (parseInt(numItem, 10) + 1).toString();
+            localStorage.setItem('proximoNumItemPorSetor', JSON.stringify(proximoNumItemPorSetor));
+        } catch {}
         statusMsg.textContent = 'Cadastro salvo localmente para o setor. Envie para a planilha ao finalizar.';
 
         // Atualiza tabela e botão
@@ -388,6 +411,22 @@ form.addEventListener('submit', async (e)=>{
             renderTabelaPendentes();
             atualizarVisibilidadeBtnEnviar();
             statusMsg.textContent = 'Todos os cadastros do setor enviados para a planilha!';
+            // Sincroniza novamente os dados gerais do Sheets
+            try {
+                const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=setores');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    if (Array.isArray(data.setores)) {
+                        localStorage.setItem('setoresDisponiveis', JSON.stringify(data.setores));
+                    }
+                    if (data.proximoNumItem && typeof data.proximoNumItem === 'object') {
+                        localStorage.setItem('proximoNumItemPorSetor', JSON.stringify(data.proximoNumItem));
+                    }
+                    if (Array.isArray(data.itens)) {
+                        localStorage.setItem('itensCadastrados', JSON.stringify(data.itens));
+                    }
+                }
+            } catch {}
         } else {
             statusMsg.textContent = 'Erro ao enviar para a planilha. Tente novamente.';
         }
@@ -397,7 +436,18 @@ form.addEventListener('submit', async (e)=>{
 
     btnEnviarPlanilha.addEventListener('click', enviarTodosParaPlanilha);
 btnLimpar.addEventListener('click', ()=>{
-    form.reset(); resetRPBlocks(); statusMsg.textContent = '';
+    form.reset(); 
+    resetRPBlocks(); 
+    statusMsg.textContent = '';
+    // Limpa a tabela de itens cadastrados
+    tbody.innerHTML = '';
+    // Limpa o cache do setor atual (igual ao envio, mas sem enviar nada)
+    limparCacheSetorAtual();
     // Mantém o próximo número do item
     numItemEl.value = contadorItem;
+    atualizarVisibilidadeBtnEnviar();
+    // Garante que o formulário está pronto para novo cadastro
+    setTimeout(() => {
+        form.querySelector('input,select,textarea')?.focus();
+    }, 100);
 });

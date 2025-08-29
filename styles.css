@@ -1,3 +1,114 @@
+/* --- RESPONSIVIDADE APRIMORADA PARA CELULAR E TABLET --- */
+@media (max-width: 900px) {
+    main, .setor-container, .itens-container, .card {
+        max-width: 100vw !important;
+        min-width: 0 !important;
+        width: 100vw !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding-left: 2vw !important;
+        padding-right: 2vw !important;
+    }
+    .grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    .actions {
+        flex-direction: column !important;
+        gap: 10px !important;
+        width: 100% !important;
+    }
+    .btn-primary, .btn-secondary, .btn-add-unidade-atualizar, .btn-add-unidade-item, .btn-add-unidade-enviarPlanilha, .btn-add-unidade-addUnidade, button {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin-bottom: 10px !important;
+        font-size: 0.9rem !important;
+        padding: 14px 0 !important;
+    }
+    select, input, textarea {
+        width: 100% !important;
+        min-width: 0 !important;
+        font-size: 1.08rem !important;
+        padding: 12px 10px !important;
+        margin-bottom: 10px !important;
+    }
+    .filtro-setor {
+        width: 100% !important;
+        margin-bottom: 10px !important;
+    }
+    .img-thumb, .thumbs img {
+        width: 40px !important;
+        height: 40px !important;
+    }
+    h1, h2 {
+        font-size: 1.15rem !important;
+        text-align: center !important;
+    }
+    .painel-offline {
+        font-size: 0.98rem;
+        padding: 8px 4px;
+    }
+}
+
+/* TABELAS RESPONSIVAS: MELHOR VISUAL E LEITURA */
+@media (max-width: 700px) {
+    .responsive-table thead {
+        display: none !important;
+    }
+    .responsive-table, .responsive-table tbody, .responsive-table tr {
+        display: block !important;
+        width: 100% !important;
+    }
+    .responsive-table tr {
+        margin-bottom: 18px !important;
+        border-bottom: 2px solid #eee !important;
+        background: #fff !important;
+        border-radius: 10px !important;
+        box-shadow: 0 1px 4px #0001 !important;
+        padding: 8px 0 !important;
+    }
+    .responsive-table td {
+        display: block !important;
+        width: 100% !important;
+        padding: 36px 10px 6px 10px !important;
+        min-height: 110px !important;
+        border: none !important;
+        border-bottom: 1px solid #eee !important;
+        word-break: break-word !important;
+        font-size: 1.1rem !important;
+        background: none !important;
+        position: relative !important;
+        line-height: 2.0 !important;
+        box-sizing: border-box !important;
+    }
+    .responsive-table td:before {
+        content: attr(data-label);
+        display: block !important;
+        font-weight: bold !important;
+        color: #2f5ba3 !important;
+        font-size: 1.1rem !important;
+        margin-bottom: 24px !important;
+        white-space: normal !important;
+        line-height: 1.7 !important;
+        min-height: 32px !important;
+    }
+    .responsive-table td:last-child {
+        border-bottom: none !important;
+    }
+}
+
+/* Evita que botões e campos fiquem colados nas laterais em telas pequenas */
+@media (max-width: 500px) {
+    main, .setor-container, .itens-container, .card {
+        padding-left: 1vw !important;
+        padding-right: 1vw !important;
+    }
+    .btn-primary, .btn-secondary, .btn-add-unidade-atualizar, .btn-add-unidade-item, .btn-add-unidade-enviarPlanilha, .btn-add-unidade-addUnidade, button {
+        font-size: 1rem !important;
+        padding: 12px 0 !important;
+    }
+}
 /* Responsividade geral para todas as páginas (mobile/tablet) */
 @media (max-width: 700px) {
     body, main {
@@ -24,14 +135,14 @@
     .btn-add-unidade-atualizar, .btn-add-unidade-item, #btnEntrarCadastrar, .btn-primary, .btn-secondary, button {
         width: 100% !important;
         min-width: 0 !important;
-        font-size: 1.08rem !important;
+        font-size: 0.9rem !important;
         padding: 14px 0 !important;
         margin: 0 0 8px 0 !important;
     }
     select, input, textarea {
         width: 100% !important;
         min-width: 0 !important;
-        font-size: 1.08rem !important;
+        font-size: 0.9rem !important;
         padding: 12px 10px !important;
         margin-bottom: 8px !important;
     }
@@ -78,7 +189,7 @@
         margin-bottom: 2px;
     }
     input, select, textarea, button {
-        font-size: 1.08rem;
+        font-size: 0.9rem;
         padding: 12px 10px;
         width: 100%;
         min-width: 0;
@@ -249,6 +360,20 @@ button {
     border-radius: 8px;
     cursor: pointer;
     transition: background 0.2s;
+}
+
+.btn-add-unidade-enviarPlanilha {
+    display: block;
+    margin: 34px auto 0 auto;
+    padding: 18px 15px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: white;
+    background-color: #2f5ba3;
+    width: 100%;
 }
 
 .btn-capturar {

@@ -11,11 +11,18 @@ if (btnAtualizarSetores) {
       const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=setores');
       if (resp.ok) {
         const data = await resp.json();
+        // Esperado: data.setores (array), data.proximoNumItem (objeto), data.itens (array)
         if (Array.isArray(data.setores) && data.setores.length) {
           selectSetor.innerHTML = '<option value="">Selecione o setor</option>' + data.setores.map(s => `<option value="${s}">${s}</option>`).join('');
           filtroSetor.innerHTML = '<option value="">Todos os setores</option>' + data.setores.map(s => `<option value="${s}">${s}</option>`).join('');
           localStorage.setItem('setoresDisponiveis', JSON.stringify(data.setores));
-          statusMsg.textContent = 'Setores atualizados com sucesso!';
+          if (data.proximoNumItem && typeof data.proximoNumItem === 'object') {
+            localStorage.setItem('proximoNumItemPorSetor', JSON.stringify(data.proximoNumItem));
+          }
+          if (Array.isArray(data.itens)) {
+            localStorage.setItem('itensCadastrados', JSON.stringify(data.itens));
+          }
+          statusMsg.textContent = 'Setores, itens e dados atualizados com sucesso!';
         } else {
           statusMsg.textContent = 'Nenhum setor encontrado no Sheets.';
         }
@@ -117,13 +124,17 @@ function renderTabela() {
   }).forEach(item => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td data-label="Setor">${item.setor || ''}</td>
-      <td data-label="RP">${item.rp || ''}</td>
-      <td data-label="Especificação">${item.especificacao || ''}</td>
-      <td data-label="Quantidade">${item.quantidade || ''}</td>
+      <td data-label="Setor"><span class="cell-value">${item.setor || ''}</span></td>
+      <td data-label="RP"><span class="cell-value">${item.rp || ''}</span></td>
+      <td data-label="Especificação"><span class="cell-value">${item.especificacao || ''}</span></td>
+      <td data-label="Quantidade"><span class="cell-value">${item.quantidade || ''}</span></td>
     `;
     tabelaItens.appendChild(tr);
   });
+// Garante que o valor da célula fique em nova linha no mobile
+const styleCellValue = document.createElement('style');
+styleCellValue.innerHTML = `@media (max-width: 700px) { .responsive-table td .cell-value { display: block; margin-top: 2px; font-weight: 400; color: #222; word-break: break-word; } }`;
+document.head.appendChild(styleCellValue);
 }
 
 
