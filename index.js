@@ -2,11 +2,13 @@
 const btnAtualizarSetores = document.getElementById('btnAtualizarSetores');
 if (btnAtualizarSetores) {
   btnAtualizarSetores.addEventListener('click', async () => {
-    btnAtualizarSetores.disabled = true;
-    btnAtualizarSetores.textContent = 'Atualizando...';
-    selectSetor.disabled = true;
-    filtroSetor.disabled = true;
-    btnEntrarCadastrar.disabled = true;
+  // Limpa todo o localStorage antes de atualizar
+  localStorage.clear();
+  btnAtualizarSetores.disabled = true;
+  btnAtualizarSetores.textContent = 'Atualizando...';
+  selectSetor.disabled = true;
+  filtroSetor.disabled = true;
+  btnEntrarCadastrar.disabled = true;
     try {
       const resp = await fetch(GOOGLE_APPS_SCRIPT_URL + '?pagina=setores');
       if (resp.ok) {
